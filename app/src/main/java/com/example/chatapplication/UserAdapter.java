@@ -12,6 +12,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.chatapplication.Models.User;
+import com.google.gson.Gson;
 
 import java.util.ArrayList;
 
@@ -40,8 +41,10 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
             int position = getAdapterPosition();
             if(position != RecyclerView.NO_POSITION){
                 User user = mUsers.get(position);
-                Toast.makeText(context, nameTextView.getText(), Toast.LENGTH_SHORT).show();
+                Gson gson = new Gson();
+                String userDetails = gson.toJson(user);
                 Intent intent = new Intent(context,ChatActivity.class);
+                intent.putExtra("userDetails",userDetails);
                 context.startActivity(intent);
 
             }

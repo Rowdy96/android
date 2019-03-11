@@ -2,9 +2,18 @@ package com.example.chatapplication.Models;
 
 public class User {
 
+    private int id;
+    private String token;
+    private String name;
 
-    public String token;
-    public String name;
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
 
     public String getToken() {
         return token;
@@ -13,6 +22,7 @@ public class User {
     public void setToken(String token) {
         this.token = token;
     }
+
 
     public String getName() {
         return name;
