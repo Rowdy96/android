@@ -2,6 +2,7 @@ package com.example.chatapplication;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -41,7 +42,7 @@ public class ChatActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
 
-        Context context = this;
+        final Context context = this;
 
         messageStringList = new ArrayList<>();
         userName = (TextView) findViewById(R.id.userName);
@@ -50,7 +51,7 @@ public class ChatActivity extends AppCompatActivity {
         button = (Button) findViewById(R.id.btnsend);
 
         Gson gson = new Gson();
-        User user = gson.fromJson(getIntent().getStringExtra("userDetails"),User.class);
+        final User user = gson.fromJson(getIntent().getStringExtra("userDetails"),User.class);
 
         final int id = user.getId();
         userName.setText(user.getName());
@@ -58,18 +59,46 @@ public class ChatActivity extends AppCompatActivity {
         SharedPreferences sharedPreferences = getSharedPreferences(getPackageName()+".my_prefs", Context.MODE_PRIVATE);
         final String token  = sharedPreferences.getString("Token","N/A");
 
-        final UserService userService = ServiceBuilder.createService(UserService.class);
+        Messages(token,id);
+
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                chat = chatbox.getText().toString();
+                UserService userService = ServiceBuilder.createService(UserService.class);
+                Call<messages> sendMessage = userService.SendMessage(token,id,chat);
+                sendMessage.enqueue(new Callback<messages>() {
+                    @Override
+                    public void onResponse(Call<messages> call, Response<messages> response) {
+
+                        messageStringList.add(chat);
+                        adapter.notifyDataSetChanged();
+                        chatbox.setText("");
+                        Toast.makeText(context, "sent to "+ user.getName(), Toast.LENGTH_SHORT).show();
+
+                    }
+                    @Override
+                    public void onFailure(Call<messages> call, Throwable t) {
+                        Toast.makeText(ChatActivity.this, "Failed to send", Toast.LENGTH_SHORT).show();
+                 }
+              });
+            }
+        });
+    }
+
+    void Messages(String token ,int id){
+        UserService userService = ServiceBuilder.createService(UserService.class);
         Call<ArrayList<messages>> createRequest = userService.GetMessages(token,id);
 
         createRequest.enqueue(new Callback<ArrayList<messages>>() {
             @Override
             public void onResponse(Call<ArrayList<messages>> call, Response<ArrayList<messages>> response) {
 
-              messageList = response.body();
+                messageList = response.body();
 
-              for (int i=0 ;i<messageList.size();i++){
-                 messageStringList.add(messageList.get(i).getMessage());
-             }
+                for (int i=0 ;i<messageList.size();i++){
+                    messageStringList.add(messageList.get(i).getMessage());
+                }
                 adapter = new ArrayAdapter<String>(ChatActivity.this,android.R.layout.simple_list_item_1
                         ,messageStringList);
                 messageView.setAdapter(adapter);
@@ -78,31 +107,6 @@ public class ChatActivity extends AppCompatActivity {
             @Override
             public void onFailure(Call<ArrayList<messages>> call, Throwable t) {
                 Toast.makeText(ChatActivity.this, "failed!!", Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                chat = chatbox.getText().toString();
-                //UserService userService = ServiceBuilder.createService(UserService.class);
-                Call<messages> sendMessage = userService.SendMessage(token,id,chat);
-                sendMessage.enqueue(new Callback<messages>() {
-                    @Override
-                    public void onResponse(Call<messages> call, Response<messages> response) {
-
-      //                  Toast.makeText(ChatActivity.this, chat, Toast.LENGTH_SHORT).show();
-
-                        messageStringList.add(chat);
-                        adapter.notifyDataSetChanged();
-
-                    }
-
-                    @Override
-                    public void onFailure(Call<messages> call, Throwable t) {
-                        Toast.makeText(ChatActivity.this, "Failed to send", Toast.LENGTH_SHORT).show();
-                 }
-              });
             }
         });
     }

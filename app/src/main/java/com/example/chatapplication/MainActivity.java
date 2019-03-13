@@ -53,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
 
                             Intent intent = new Intent(getApplicationContext(), UserListActivity.class);
                             startActivity(intent);
-                            Toast.makeText(MainActivity.this, response.body().getToken(), Toast.LENGTH_SHORT).show();
+                           // Toast.makeText(MainActivity.this, response.body().getToken(), Toast.LENGTH_SHORT).show();
                         }
 
                         @Override
@@ -63,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
                     });
                 }
                 else{
-                    Toast.makeText(MainActivity.this, "Inavalid Name", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, "Invalid Name", Toast.LENGTH_SHORT).show();
                 }
             }
         });

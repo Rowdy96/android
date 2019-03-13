@@ -46,7 +46,7 @@ public class UserListActivity extends AppCompatActivity {
             @Override
             public void onResponse(retrofit2.Call<ArrayList<User>> call, Response<ArrayList<User>> response) {
 
-                Toast.makeText(UserListActivity.this, token, Toast.LENGTH_SHORT).show();
+              //  Toast.makeText(UserListActivity.this, token, Toast.LENGTH_SHORT).show();
                 ArrayList<User> userList = response.body();
                 adapter = new UserAdapter(userList);
                 recyclerView.setHasFixedSize(true);
@@ -58,7 +58,7 @@ public class UserListActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(retrofit2.Call<ArrayList<User>> call, Throwable t) {
-
+                Toast.makeText(UserListActivity.this, "Failed to load", Toast.LENGTH_SHORT).show();
             }
         });
     }
