@@ -3,6 +3,7 @@ package com.example.chatapplication;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -38,34 +39,44 @@ public class MainActivity extends AppCompatActivity {
                 if(!etName.getText().toString().contains(" ")) {
                     User user = new User();
                     user.setName(etName.getText().toString());
+                    if(isNetworkConnected()) {
+                        UserService userService = ServiceBuilder.createService(UserService.class);
+                        Call<User> createRequest = userService.AddUser(user);
 
-                    UserService userService = ServiceBuilder.createService(UserService.class);
-                    Call<User> createRequest = userService.AddUser(user);
+                        createRequest.enqueue(new Callback<User>() {
+                            @Override
+                            public void onResponse(Call<User> call, Response<User> response) {
+                                SharedPreferences sharedPreferences = getSharedPreferences(getPackageName() + ".my_prefs", Context.MODE_PRIVATE);
+                                SharedPreferences.Editor editor = sharedPreferences.edit();
+                                String token = response.body().getToken();
+                                editor.putString("Token", token);
+                                editor.apply();
 
-                    createRequest.enqueue(new Callback<User>() {
-                        @Override
-                        public void onResponse(Call<User> call, Response<User> response) {
-                            SharedPreferences sharedPreferences = getSharedPreferences(getPackageName()+".my_prefs", Context.MODE_PRIVATE);
-                            SharedPreferences.Editor editor = sharedPreferences.edit();
-                            String  token = response.body().getToken();
-                            editor.putString("Token",token);
-                            editor.apply();
+                                Intent intent = new Intent(getApplicationContext(), UserListActivity.class);
+                                startActivity(intent);
 
-                            Intent intent = new Intent(getApplicationContext(), UserListActivity.class);
-                            startActivity(intent);
-                            Toast.makeText(MainActivity.this, response.body().getToken(), Toast.LENGTH_SHORT).show();
-                        }
+                            }
 
-                        @Override
-                        public void onFailure(Call<User> call, Throwable t) {
-                            Toast.makeText(MainActivity.this, "Failed to Login", Toast.LENGTH_SHORT).show();
-                        }
-                    });
+                            @Override
+                            public void onFailure(Call<User> call, Throwable t) {
+                                Toast.makeText(MainActivity.this, "Failed to Log in", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    }else {
+                        Intent intent = new Intent(getApplicationContext(), UserListActivity.class);
+                        startActivity(intent);
+                        Toast.makeText(MainActivity.this, "this is offline mode", Toast.LENGTH_SHORT).show();
+                    }
                 }
                 else{
-                    Toast.makeText(MainActivity.this, "Inavalid Name", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, "Invalid Name", Toast.LENGTH_SHORT).show();
                 }
             }
         });
+    }
+
+    private boolean isNetworkConnected() {
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        return cm.getActiveNetworkInfo() != null;
     }
 }

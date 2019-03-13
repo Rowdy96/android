@@ -1,5 +1,7 @@
 package com.example.chatapplication.services;
 
+import android.os.Message;
+
 import com.example.chatapplication.Models.User;
 import com.example.chatapplication.Models.messages;
 
@@ -29,9 +31,7 @@ public interface UserService {
     @POST("user/login")
     Call<User> AddUser(@Body User newUser);
 
-    @FormUrlEncoded
-    @Headers("Content-Type: application/json")
     @POST ("chat")
-    Call<messages> SendMessage(@Header("Authorization") String authToken ,@Field("toUserId") int userId,@Field("message") String message);
+    Call<Void> SendMessage(@Header("Authorization") String authToken ,@Body messages message);
 
 }

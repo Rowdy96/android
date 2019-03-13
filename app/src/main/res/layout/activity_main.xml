@@ -15,9 +15,19 @@
         android:textSize="30sp"
         android:layout_marginTop="30dp"/>
 
+    <ImageView
+        android:id="@+id/imageView3"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:layout_below="@+id/textview1"
+        android:layout_centerVertical="true"
+        android:layout_marginTop="4dp"
+        app:srcCompat="@drawable/user"
+        android:layout_centerInParent="true"/>
+
     <EditText
         android:id="@+id/etName"
-        android:layout_width="match_parent"
+        android:layout_width="300dp"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
         android:layout_marginTop="100dp"
